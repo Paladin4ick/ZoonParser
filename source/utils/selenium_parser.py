@@ -49,17 +49,19 @@ def get_auto_services_link(auto_services: list[WebElement]) -> list[str] | None:
 
 def extract_last_review_and_copy(driver: webdriver.Chrome, service_link: str):
     try:
-        # Запоминаем текущий URL
         driver.get(service_link)
-        print(service_link)
-        # Ищем кнопку с текстом "Отзывы" и кликаем по ней
-        reviews_button = WebDriverWait(driver, 10).until(
-            exp_cond.element_to_be_clickable((By.XPATH, "//*[@id='serviceNavPanel']//span[text()='Отзывы']/parent::a"))
+        element = WebDriverWait(driver, 10).until(
+            exp_cond.element_to_be_clickable((By.XPATH, f"//*[contains(text(), 'Отзывы')]"))
         )
 
-        reviews_button.click()
+        # Прокручиваем к элементу, если он не виден
+        driver.execute_script("arguments[0].scrollIntoView(true);", element)
+        time.sleep(3)  # Небольшая пауза, чтобы элемент полностью прогрузился
 
-
+        # Кликаем по элементу
+        element.click()
+        print(f"Успешно кликнули на элемент с текстом: Отзывы")
+        time.sleep(3)
 
     except Exception as e:
         logger.error(f"Ошибка копирования отзыва: {e}", exc_info=True)
